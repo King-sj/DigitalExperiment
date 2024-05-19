@@ -27,9 +27,9 @@
 #*.xci(www.spiritconsortium.org)
 !*.xci
 #*.dcp(checkpoint files)
-!*.dcp
-!*.vds
-!*.pb
+# !*.dcp
+# !*.vds
+# !*.pb
 #All bd comments and layout coordinates are stored within .ui
 !*.ui
 !*.ooc
@@ -56,26 +56,26 @@
 #Do NOT ignore *.xpr files
 !*.xpr
 #Include *.xml files for 2013.4 or earlier version
-!*.xml
+# !*.xml
 #########
 #Constraint files
 #########
 #Do NOT ignore *.xdc files
-!*.xdc
+# !*.xdc
 #########
 #TCL - files
 #########
-!*.tcl
+# !*.tcl
 #########
 #Journal - files
 #########
-!*.jou
+# !*.jou
 #########
 #Reports
 #########
-!*.rpt
-!*.txt
-!*.vdi
+# !*.rpt
+# !*.txt
+# !*.vdi
 #########
 #C-files
 #########
