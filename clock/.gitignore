@@ -47,8 +47,8 @@
 #########
 #MIG
 #########
-!*.prj
-!*.mem
+# !*.prj
+# !*.mem
 #########
 #Project files
 #########
@@ -79,9 +79,10 @@
 #########
 #C-files
 #########
-!*.c
+# !*.c
 !*.h
 !*.elf
 !*.bmm
 !*.xmp
 */clock.cache
+*/clock.sim

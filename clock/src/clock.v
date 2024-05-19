@@ -11,14 +11,14 @@ module clock(
   output [3:0] sm_right_wei,  //
   output [7:0] sm_right_duan  //
 );
-//---------------------??(1HZ)-------------------------------------------
+//---------------------分频(1HZ)-------------------------------------------
   reg one_hz_clk;  // 1HZ??
   reg [32:0] one_hz_counter;
   always @(posedge clk or posedge reset) begin
     if (reset) begin
       one_hz_clk<=0;
     end else begin
-      if (one_hz_counter == 100/2-1) begin
+      if (one_hz_counter == 100000000/2-2) begin
         one_hz_counter<=0;
         one_hz_clk<=~one_hz_clk;
       end
