@@ -6,11 +6,7 @@ module clock(
   input right,
   input up,
   input down,
-<<<<<<< HEAD
-  output [3:0] sm_left_wei,  // ??????
-=======
   output [3:0] sm_left_wei,  // 左边的数码管
->>>>>>> 32ebf23303922a783cabaa80baabb4c7e3afb5bd
   output [7:0] sm_left_duan,  //
   output [3:0] sm_right_wei,  //
   output [7:0] sm_right_duan  //
