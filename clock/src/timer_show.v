@@ -13,14 +13,14 @@ module timer_show(
 
   assign hours_high = hours/10;
   assign hours_low = hours%10;
-  assign minutes_high = hours/10;
-  assign minutes_low = hours%10;
-  assign seconds_high = hours/10;
-  assign seconds_low = hours%10;
+  assign minutes_high = minutes/10;
+  assign minutes_low = minutes%10;
+  assign seconds_high = seconds/10;
+  assign seconds_low = seconds%10;
 
   always @(posedge clk) begin
-    left_data <= {4'hf,4'hf, hours_high, hours_low};
-    right_data <= {minutes_high, minutes_low, seconds_high, seconds_low};
+    left_data <= {hours_low,hours_high,4'hf,4'hf};
+    right_data <= {seconds_low,seconds_high,minutes_low,minutes_high};
   end
   smg_ip_model smg_left(
     .clk(clk), .data(left_data),

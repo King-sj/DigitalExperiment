@@ -28,13 +28,14 @@ output [3:0] sm_wei;  //
 output [7:0] sm_duan;  //
 
 //分频
-integer clk_cnt;
-reg clk_1kHz;
+integer clk_cnt=0;
+reg clk_1kHz=0;
 always @(posedge clk) begin
   if(clk_cnt==32'd50000-1)
     begin clk_cnt <= 1'b0; clk_1kHz <= ~clk_1kHz;end
-  else
+  else begin
     clk_cnt <= clk_cnt + 1'b1;
+  end
 end
 
 //----------------------------------------------------------
@@ -46,7 +47,7 @@ end
 
 //段控制
 reg [3:0]duan_ctrl;
-always @(wei_ctrl) begin
+always @(posedge clk) begin
 case(wei_ctrl)
   4'b1110:duan_ctrl=data[3:0];
   4'b1101:duan_ctrl=data[7:4];
@@ -59,7 +60,7 @@ end
 //----------------------------------------------------------
 //解码模块
 reg [7:0]duan;
-always @(duan_ctrl) begin
+always @(posedge clk) begin
   case(duan_ctrl)
     4'h0:duan=8'b0011_1111;//0
     4'h1:duan=8'b0000_0110;//1

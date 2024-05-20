@@ -17,12 +17,16 @@ module counter(
       count <= set_count;
       carry_out <= 0;
     end else if (enable) begin
-      if (count >= MAX_COUNT) begin
+      if (count == MAX_COUNT) begin
         count <= 0;
-        carry_out <= 1;
+        carry_out <= 0;
       end else begin
         count <= count + 1;
-        carry_out <= 0;
+        if(count == MAX_COUNT-1) begin  // 提前触发
+           carry_out <= 1;
+        end else begin
+          carry_out <= 0;
+        end
       end
     end else begin
       carry_out <= 0;
