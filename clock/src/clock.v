@@ -33,31 +33,22 @@ module clock(
     .seconds(seconds), .minutes(minutes),.hours(hours)  // 输出
   );
 //---------------------设置-------------------------------------------
-reg [5:0] set_hours, set_minutes, set_seconds;  //
-reg [2:0] pos;  // ??
-always @(posedge set_mod) begin
-  set_hours <= hours;
-  set_minutes <= minutes;
-  set_seconds <= seconds;
-end
-always @(posedge left) begin
-  if (set_mod) begin
-    if (pos == 5) pos = 0;
-    else pos <= pos+1;
-  end
-end
-always @(posedge right) begin
-  if (set_mod) begin
-    if (pos == 0) pos = 5;
-    else pos <= pos-1;
-  end
-end
+wire [5:0] set_seconds, set_minutes, set_hours;
+wire [2:0] pos;
+timer_setting timer_setter(
+  .clk(clk), .reset(reset), .set_mod(set_mod), .left(left), .right(right),
+  .up(up), .down(down), .hours(hours), .minutes(minutes), .seconds(seconds),
+  .set_hours(set_hours), .set_minutes(set_minutes), .set_seconds(set_seconds),  // out
+  .pos(pos)
+);
+
 //---------------------显示-------------------------------------------
-  timer_show timer_shower(
-    .clk(clk), .hours(hours), .minutes(minutes), .seconds(seconds),
-    .sm_left_wei(sm_left_wei),  // 输出
-    .sm_left_duan(sm_left_duan),
-    .sm_right_wei(sm_right_wei),
-    .sm_right_duan(sm_right_duan)
-  );
+timer_show timer_shower(
+  .clk(clk), .hours(hours), .minutes(minutes), .seconds(seconds),
+  .pos(pos),
+  .left_wei(sm_left_wei),  // 输出
+  .left_duan(sm_left_duan),
+  .right_wei(sm_right_wei),
+  .right_duan(sm_right_duan)
+);
 endmodule
