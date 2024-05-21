@@ -4,6 +4,7 @@ module timer_show(
   input [5:0]minutes,
   input [5:0]seconds,
   input [2:0] pos,
+  input set_mod,
   output [3:0] left_wei,  // 左边的数码管
   output [7:0] left_duan,  //
   output [3:0] right_wei,  //
@@ -24,17 +25,21 @@ module timer_show(
   wire [2:0] flash_pos;
   // pos : 0->5分别是 sec_low, sec_high, min_low, ..., 但是与其在数码管上的实际位置不同
   // (hh::mm::ss) -> 左(3,2) 右(0,1) 右(2,3)
-  assign flash_pos = (flash_pos > 3) ? (7-pos) :(3-pos);
+  assign flash_pos = (pos > 3) ? (7-pos) :(3-pos);
 
   reg[7:0] flash = 0;
   always @(posedge clk_2Hz) begin
-    flash <= ~flash;
+    if (set_mod) begin
+      flash <= ~flash;
+    end else begin
+      flash <= ~(8'd0);
+    end
   end
   wire [3:0] select_wei;
   assign select_wei = 1 << flash_pos;
-  assign left_duan = (pos <= 3 && select_wei == left_wei) ?
+  assign left_duan = (pos > 3 && select_wei == left_wei) ?
     (flash & sm_left_duan) : sm_left_duan;
-  assign right_duan = (pos > 3 && select_wei == right_wei) ?
+  assign right_duan = (pos <= 3 && select_wei == right_wei) ?
     (flash & sm_right_duan) : sm_right_duan;
 //------------------------获取段选信号和位选信号--------------------------------
   reg [15:0] left_data, right_data;

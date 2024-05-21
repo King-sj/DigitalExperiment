@@ -41,30 +41,35 @@ module timer_setting(
   input [5:0] seconds,
   input [5:0] minutes,
   input [5:0] hours,
-  output reg [7:0] set_hours,
-  output reg [7:0] set_minutes,
-  output reg [7:0] set_seconds,
+  output reg signed [32:0] set_hours,
+  output reg signed [32:0] set_minutes,
+  output reg signed [32:0] set_seconds,
   output reg [2:0] pos
 );
-always @(posedge left) begin
-  if (set_mod) begin
-    if (pos == 5) pos = 0;
-    else pos <= pos+1;
+always @(posedge left or posedge right or posedge reset) begin
+  if (reset) begin
+    pos <= 0;
+  end else if (left) begin
+    if (pos == 5) begin
+      pos <= 0;
+    end else begin
+      pos <= pos+1;
+    end
+  end else if (right) begin
+    if (pos == 0) begin
+      pos <= 5;
+    end else begin
+      pos <= pos-1;
+    end
   end
 end
-always @(posedge right) begin
-  if (set_mod) begin
-    if (pos == 0) pos = 5;
-    else pos <= pos-1;
-  end
-end
-
+//-----------------------------------------------------------
+reg copy_source_time=0;
 always @(posedge clk) begin
   if (reset) begin
     set_seconds <= 0;
     set_minutes <= 0;
     set_hours <= 0;
-    pos <= 0;
   end else if (set_mod) begin
     if (up) begin
       case (pos)
@@ -72,25 +77,28 @@ always @(posedge clk) begin
         3'd1: set_seconds <= (set_seconds + 10) % 60;
         3'd2: set_minutes <= (set_minutes + 1) % 60;
         3'd3: set_minutes <= (set_minutes + 10) % 60;
-        3'd4: set_hours <= (set_hours + 1) % 24;
-        3'd5: set_hours <= (set_hours + 10) % 24;
+        3'd4: set_hours   <= (set_hours + 1) % 24;
+        3'd5: set_hours   <= (set_hours + 10) % 24;
       endcase
     end else if (down) begin
       case (pos)
-        3'd0: set_seconds <= (set_seconds - 1) % 60;
-        3'd1: set_seconds <= (set_seconds - 10) % 60;
-        3'd2: set_minutes <= (set_minutes - 1) % 60;
-        3'd3: set_minutes <= (set_minutes - 10) % 60;
-        3'd4: set_hours   <= (set_hours - 1) % 24;
-        3'd5: set_hours   <= (set_hours - 10) % 24;
+        3'd0: set_seconds <= (set_seconds - 1+60) % 60;
+        3'd1: set_seconds <= (set_seconds - 10+60) % 60;
+        3'd2: set_minutes <= (set_minutes - 1+60) % 60;
+        3'd3: set_minutes <= (set_minutes - 10+60) % 60;
+        3'd4: set_hours   <= (set_hours - 1+60) % 24;
+        3'd5: set_hours   <= (set_hours - 10+60) % 24;
       endcase
     end else begin
-      set_hours <= hours;
-      set_minutes <= minutes;
-      set_seconds <= seconds;
+      if (~copy_source_time) begin
+        set_hours <= hours;
+        set_minutes <= minutes;
+        set_seconds <= seconds;
+        copy_source_time <= 1;
+      end
     end
+  end else if (~set_mod) begin
+    copy_source_time <= 0;
   end
 end
-
-
 endmodule

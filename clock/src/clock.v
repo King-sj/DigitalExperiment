@@ -45,7 +45,7 @@ timer_setting timer_setter(
 //---------------------显示-------------------------------------------
 timer_show timer_shower(
   .clk(clk), .hours(hours), .minutes(minutes), .seconds(seconds),
-  .pos(pos),
+  .pos(pos), .set_mod(set_mod),
   .left_wei(sm_left_wei),  // 输出
   .left_duan(sm_left_duan),
   .right_wei(sm_right_wei),
