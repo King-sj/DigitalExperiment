@@ -9,7 +9,9 @@ module clock(
   output [3:0] sm_left_wei,  // 左边的数码管
   output [7:0] sm_left_duan,  //
   output [3:0] sm_right_wei,  //
-  output [7:0] sm_right_duan
+  output [7:0] sm_right_duan,
+  output beep,
+  output sd
 );
 //---------------------分频(1HZ)-------------------------------------------
   reg one_hz_clk = 0;  // 1HZ
@@ -50,5 +52,13 @@ timer_show timer_shower(
   .left_duan(sm_left_duan),
   .right_wei(sm_right_wei),
   .right_duan(sm_right_duan)
+);
+//---------------------------音频-------------------------------------------
+wire beep_w;
+assign beep = (minutes == 0) & beep_w;
+audio_player audio(
+  .clk(clk),
+  .beep(beep_w),
+  .sd(sd)
 );
 endmodule
