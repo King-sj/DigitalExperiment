@@ -2,7 +2,7 @@ module clock(
   input clk,  // 100MHz
   input reset,
   input set_mod,  // ????
-  input left,  //
+  input left,  // 按钮输入
   input right,
   input up,
   input down,
@@ -27,6 +27,32 @@ module clock(
       end else one_hz_counter <= one_hz_counter+1;
     end
   end
+//---------------------去抖动---------------------------------------------
+  wire left_clean, right_clean, up_clean, down_clean;
+  debounce db_left(
+    .clk(clk),
+    .reset(reset),
+    .noisy_signal(left),
+    .clean_signal(left_clean)
+  );
+  debounce db_right(
+    .clk(clk),
+    .reset(reset),
+    .noisy_signal(right),
+    .clean_signal(right_clean)
+  );
+  debounce db_up(
+    .clk(clk),
+    .reset(reset),
+    .noisy_signal(up),
+    .clean_signal(up_clean)
+  );
+  debounce db_down(
+    .clk(clk),
+    .reset(reset),
+    .noisy_signal(down),
+    .clean_signal(down_clean)
+  );
 //---------------------计时-------------------------------------------
   wire [5:0] seconds, minutes, hours;
   Ktime timer(
@@ -38,8 +64,8 @@ module clock(
 wire [5:0] set_seconds, set_minutes, set_hours;
 wire [2:0] pos;
 timer_setting timer_setter(
-  .clk(clk), .reset(reset), .set_mod(set_mod), .left(left), .right(right),
-  .up(up), .down(down), .hours(hours), .minutes(minutes), .seconds(seconds),
+  .clk(clk), .reset(reset), .set_mod(set_mod), .left(left_clean), .right(right_clean),
+  .up(up_clean), .down(down_clean), .hours(hours), .minutes(minutes), .seconds(seconds),
   .set_hours(set_hours), .set_minutes(set_minutes), .set_seconds(set_seconds),  // out
   .pos(pos)
 );

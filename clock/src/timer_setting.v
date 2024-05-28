@@ -46,32 +46,49 @@ module timer_setting(
   output reg signed [32:0] set_seconds,
   output reg [2:0] pos
 );
-always @(posedge left or posedge right or posedge reset) begin
+// 定义保存前一个状态的寄存器
+reg left_prev;
+reg right_prev;
+always @(posedge clk or posedge reset) begin
   if (reset) begin
     pos <= 0;
-  end else if (left) begin
-    if (pos == 5) begin
-      pos <= 0;
-    end else begin
-      pos <= pos+1;
+    left_prev <= 0;
+    right_prev <= 0;
+  end else begin
+    // 更新前一个状态的寄存器
+    left_prev <= left;
+    right_prev <= right;
+    // 检测left的上升沿
+    if (left && !left_prev && !right) begin
+      if (pos == 5)
+        pos <= 0;
+      else
+        pos <= pos + 1;
     end
-  end else if (right) begin
-    if (pos == 0) begin
-      pos <= 5;
-    end else begin
-      pos <= pos-1;
+    // 检测right的上升沿
+    if (right && !right_prev && !left) begin
+      if (pos == 0)
+        pos <= 5;
+      else
+        pos <= pos - 1;
     end
   end
 end
 //-----------------------------------------------------------
 reg copy_source_time=0;
-always @(posedge clk) begin
+// 定义保存前一个状态的寄存器
+reg up_prev;
+reg down_prev;
+
+always @(posedge clk, posedge reset) begin
   if (reset) begin
     set_seconds <= 0;
     set_minutes <= 0;
     set_hours <= 0;
   end else if (set_mod) begin
-    if (up) begin
+    up_prev <= up;
+    down_prev <= down;
+    if (up && !up_prev && !down) begin
       case (pos)
         3'd0: set_seconds <= (set_seconds + 1) % 60;
         3'd1: set_seconds <= (set_seconds + 10) % 60;
@@ -80,25 +97,20 @@ always @(posedge clk) begin
         3'd4: set_hours   <= (set_hours + 1) % 24;
         3'd5: set_hours   <= (set_hours + 10) % 24;
       endcase
-    end else if (down) begin
+    end else if (down && !down_prev && !up) begin
       case (pos)
         3'd0: set_seconds <= (set_seconds - 1+60) % 60;
         3'd1: set_seconds <= (set_seconds - 10+60) % 60;
         3'd2: set_minutes <= (set_minutes - 1+60) % 60;
         3'd3: set_minutes <= (set_minutes - 10+60) % 60;
-        3'd4: set_hours   <= (set_hours - 1+60) % 24;
-        3'd5: set_hours   <= (set_hours - 10+60) % 24;
+        3'd4: set_hours   <= (set_hours - 1+24) % 24;
+        3'd5: set_hours   <= (set_hours - 10+24) % 24;
       endcase
-    end else begin
-      if (~copy_source_time) begin
-        set_hours <= hours;
-        set_minutes <= minutes;
-        set_seconds <= seconds;
-        copy_source_time <= 1;
-      end
     end
   end else if (~set_mod) begin
-    copy_source_time <= 0;
+    set_hours <= hours;
+    set_minutes <= minutes;
+    set_seconds <= seconds;
   end
 end
 endmodule

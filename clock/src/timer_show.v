@@ -53,7 +53,7 @@ module timer_show(
   assign seconds_low = seconds%10;
 
   always @(posedge clk) begin
-    left_data <= {hours_low,hours_high,{1'b0,flash_pos},{1'b0,pos}};  // TODO(SJ): just test pos
+    left_data <= {hours_low,hours_high,{4'b1111},{4'b1111}};  // TODO(SJ): just test pos
     right_data <= {seconds_low,seconds_high,minutes_low,minutes_high};
   end
   smg_ip_model smg_left(
