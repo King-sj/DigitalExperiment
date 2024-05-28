@@ -27,7 +27,7 @@
  * @author KSJ
  * @date 2024-05-21
  * @version 0.0.1
- * @brief 音乐播放器, 参考https://blog.csdn.net/qq_45325783/article/details/118495592
+ * @brief 音乐播放器
 */
 module audio_player(
 input clk,
@@ -73,7 +73,7 @@ always @(posedge clk) begin
         state = 8'd0;
       else
         state = state + 1'b1;
-   case(state)//晴天前奏曲谱
+   case(state)
     8'D0:pre_number=L_1;
     8'D1:pre_number=L_2;
     8'D2:pre_number=L_3;
