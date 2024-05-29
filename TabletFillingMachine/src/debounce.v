@@ -9,8 +9,8 @@ module debounce(
   reg [20:0] counter;
   reg stable_signal;
 
-  always @(posedge clk, posedge reset) begin
-    if (reset) begin
+  always @(posedge clk, negedge reset) begin
+    if (~reset) begin
       counter <= 0;
       clean_signal <= 0;
       stable_signal <= 0;
