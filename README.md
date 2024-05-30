@@ -9,4 +9,6 @@ https://www.cnblogs.com/whik/p/11980103.html
 + gtkwave wave.vcd
 
 # 参考资料
+https://e-elements.readthedocs.io/zh/ego1_v2.2/EGo1.html#vga
+
 https://eelab.njupt.edu.cn/_upload/article/files/66/b6/7a3337224205ab8c584a9062eb89/f7af8018-fba9-474a-82f8-01042c768ce0.pdf
