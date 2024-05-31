@@ -29,17 +29,14 @@
  * @version
  * @brief 伪随机数生成器
 */
-module fibonacci_lfsr(clk, reset, random_out);
-  parameter WIDTH = 32;
-  input clk, reset;
-  output reg [WIDTH-1:0] random_out;
+module fibonacci_lfsr(clk, random_out);
+  parameter WIDTH = 16;
+  input clk;
+  output reg [WIDTH-1:0] random_out={WIDTH{1'b1}};
   wire feedback;
   assign feedback = random_out[WIDTH-1] ^ random_out[14] ^ random_out[13] ^ random_out[11];
 
-  always @(posedge clk or negedge reset) begin
-    if (~reset)
-      random_out <= {WIDTH{1'b1}};
-    else
-      random_out <= {random_out[WIDTH-2:0], feedback};
+  always @(posedge clk) begin
+    random_out <= {random_out[WIDTH-2:0], feedback};
   end
 endmodule
