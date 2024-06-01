@@ -44,20 +44,6 @@ module snake (
 );
 wire [11:0]color;
 wire [9:0]x,y;  // 640x480
-//---------------------分频(1kHZ)-------------------------------------------
-reg clk_1kHz = 0;
-reg [32:0] clk_counter;
-always @(posedge clk or negedge reset) begin
-  if (~reset) begin
-    clk_1kHz<=0;
-    clk_counter<=0;
-  end else begin
-    if (clk_counter == 100000/2-1) begin
-      clk_counter<=0;
-      clk_1kHz<=~clk_1kHz;
-    end else clk_counter <= clk_counter+1;
-  end
-end
 //---------------------去抖动---------------------------------------------
   wire left_clean, right_clean, up_clean, down_clean;
   debounce db_left(
