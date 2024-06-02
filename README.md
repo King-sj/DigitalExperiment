@@ -7,7 +7,11 @@ https://www.cnblogs.com/whik/p/11980103.html
 + iverilog -o wave led_demo_tb.v led_demo.v
 + vvp -n wave -lxt2
 + gtkwave wave.vcd
-
+# 改进方案
+  使用SRAM存储
+# 编译失败解决方案
+  + 尝试命令： ```vivado -stack 2000```
+  https://fpga.eetrend.com/content/2019/100042946.html
 # 参考资料
 https://e-elements.readthedocs.io/zh/ego1_v2.2/EGo1.html#vga
 

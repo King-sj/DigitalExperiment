@@ -2,11 +2,12 @@ module snake_model(
   clk,reset,left,right,up,down,pix_x,pix_y,
   color,food_x,food_y
 );
-parameter speed = 1,
+parameter speed = 5,
   width = 640,
   height = 480,
-  MAX_LEN = 15,
-  RAD = 10;
+  MAX_LEN = 30,
+  RAD = 10,
+  FLASH_CLOCK=10000000;  // 游戏刷新周期 (100MHZ/FLASH_CLOCK)
 input clk;
 input reset;
 input left;
@@ -26,13 +27,13 @@ output reg signed [15:0] food_y;
 //-------------------------------------------
 reg signed [15:0] snake_pos[MAX_LEN:0][1:0]; // 0:x, 1:y
 reg [15:0] snake_len = 1;
-//---------------------分频(100HZ)-------------------------------------------
-reg clk_100Hz = 0;
+//---------------------分频-------------------------------------------
+reg clk_game = 0;
 reg [32:0] clk_counter;
 always @(posedge clk) begin
-  if (clk_counter == 1000000/2-1) begin
+  if (clk_counter == FLASH_CLOCK/2-1) begin
     clk_counter<=0;
-    clk_100Hz<=~clk_100Hz;
+    clk_game<=~clk_game;
   end else clk_counter <= clk_counter+1;
 end
 //-----------------------dir-------------------------------
@@ -96,42 +97,49 @@ function [15:0] next_rand;
   end
 endfunction
 //--------------------------move-------------------------------------
-wire eaten;
-assign eaten =in_circle(snake_pos[snake_len-1][0],snake_pos[snake_len-1][1],food_x,food_y);
-
-
-always @(posedge clk_100Hz, negedge reset) begin:move
+reg [31:0] snake_cnt=0;
+wire [31:0] snake_idx;
+assign snake_idx = MAX_LEN-snake_cnt-1;
+always @(posedge clk, negedge reset) begin:move
   integer k;
   if (!reset) begin
-    food_x <= rand%width;
-    food_y <= next_rand(rand)%height;
-    snake_len <= 1;
-    snake_pos[0][0] <= width/2;
-    snake_pos[0][1] <= height/2;
-  end else if(eaten) begin
-    // 吃到食物了
-    food_x <= rand%width;
-    food_y <= next_rand(rand)%height;
-
-    if (snake_len < MAX_LEN-1) begin
-      snake_len <= snake_len + 1;
+    snake_cnt<=0;
+    for (k=0; k < MAX_LEN; k = k+1)begin
+      snake_pos[k][0] <= width/2;
+      snake_pos[k][1] <= height/2-2*k*RAD;
     end
-    for (k = 0;k < MAX_LEN;k=k+1)begin
-      if (k == snake_len) begin
-        snake_pos[k][0] <= (snake_pos[k-1][0] + 2*RAD*dir[0] + width) % width;
-        snake_pos[k][1] <= (snake_pos[k-1][1] + 2*RAD*dir[1] + height) % height;
-      end
-    end
-
   end else begin
-    for (k = 0;k < MAX_LEN;k=k+1)begin
-      if (k < snake_len-1) begin
-        snake_pos[k][0] <= snake_pos[k+1][0];
-        snake_pos[k][1] <= snake_pos[k+1][1];
-      end else if (k == snake_len-1) begin
-        snake_pos[k][0] <= (snake_pos[k][0] + speed*dir[0] + width) % width;
-        snake_pos[k][1] <= (snake_pos[k][1] + speed*dir[1] + height) % height;
+    if (snake_cnt == FLASH_CLOCK) begin  // 每隔10 ms 移动一次
+      snake_cnt <= 0;
+    end else begin
+      snake_cnt <= snake_cnt + 1;
+    end
+    // 间隔与初始值无关，只与速度有关
+    if (snake_cnt < MAX_LEN) begin
+      if (snake_idx == 0) begin
+        snake_pos[0][0] <= (snake_pos[0][0] + speed*dir[0] + width) % width;
+        snake_pos[0][1] <= (snake_pos[0][1] + speed*dir[1] + height) % height;
+      end else begin
+        snake_pos[snake_idx][0] <= snake_pos[snake_idx-1][0];
+        snake_pos[snake_idx][1] <= snake_pos[snake_idx-1][1];
       end
+    end
+  end
+end
+//------------------------eat----------------------------------
+always @(posedge clk_game, negedge reset) begin:eat
+  integer k;
+  if (!reset) begin
+    food_x <= 100;
+    food_y <= 100;
+    snake_len <= 5;
+  end else if(in_circle(snake_pos[0][0],snake_pos[0][1],food_x,food_y)) begin
+    // 吃到食物了
+    food_x <= (rand * width) >> 16;  // 假设rand是16位宽
+    food_y <= ((next_rand(rand) * height) >> 16);
+
+    if (snake_len < MAX_LEN) begin
+      snake_len <= snake_len + 1;
     end
   end
 end
