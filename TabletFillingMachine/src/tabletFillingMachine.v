@@ -77,7 +77,7 @@ always @(posedge clk, negedge reset) begin
   end else if (state == WORKING) begin
     fill_pre <= fill_clean;
     if (fill_clean && !fill_pre) begin
-      if (tablet_cnt == CAPACITY) begin
+      if (tablet_cnt == CAPACITY-1) begin
         bottle_cnt <= bottle_cnt + 1;
         tablet_cnt <= 0;
       end else begin
