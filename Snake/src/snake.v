@@ -40,7 +40,11 @@ module snake (
   output [3:0] green,
   output [3:0] blue,
   output hsync,
-  output vsync
+  output vsync,
+  output [3:0] left_wei,  // 左边的数码管
+  output [7:0] left_duan,  //
+  output [3:0] right_wei,  //
+  output [7:0] right_duan
 );
 wire [11:0]color;
 wire [9:0]x,y;  // 640x480
@@ -84,10 +88,22 @@ vga vga_shower(
 );
 
 //---------------------------------------------------
+wire [15:0] food_x, food_y;
 snake_model snaker(
   .clk(clk),.reset(reset),
   .left(left_clean),.right(right_clean),.up(up_clean),.down(down_clean),
   .pix_x(x),.pix_y(y),
-  .color(color)
+  .color(color),.food_x(food_x),.food_y(food_y)
+);
+//----------------------------------------------------------
+score_show score_shower(
+  .clk(clk),
+  .lcnt(food_x),
+  .rcnt(food_y),
+  .game_over(1'b0),
+  .left_wei(left_wei),  // 左边的数码管
+  .left_duan(left_duan),  //
+  .right_wei(right_wei),  //
+  .right_duan(right_duan)
 );
 endmodule

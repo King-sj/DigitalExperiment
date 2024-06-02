@@ -1,6 +1,6 @@
 module snake_model(
   clk,reset,left,right,up,down,pix_x,pix_y,
-  color
+  color,food_x,food_y
 );
 parameter speed = 1,
   width = 640,
@@ -21,8 +21,8 @@ input signed [15:0] pix_y;
 output reg [11:0]color;
 
 reg signed [15:0] dir[1:0];  // 方向 {0,1},...,
-reg signed [15:0] food_x;
-reg signed [15:0] food_y;
+output reg signed [15:0] food_x;
+output reg signed [15:0] food_y;
 //-------------------------------------------
 reg signed [15:0] snake_pos[MAX_LEN:0][1:0]; // 0:x, 1:y
 reg [15:0] snake_len = 1;
@@ -99,18 +99,19 @@ endfunction
 wire eaten;
 assign eaten =in_circle(snake_pos[snake_len-1][0],snake_pos[snake_len-1][1],food_x,food_y);
 
+
 always @(posedge clk_100Hz, negedge reset) begin:move
   integer k;
   if (!reset) begin
-    food_x <= RAD+rand%400;
-    food_y <= RAD+next_rand(rand)%400;
+    food_x <= rand%width;
+    food_y <= next_rand(rand)%height;
     snake_len <= 1;
     snake_pos[0][0] <= width/2;
     snake_pos[0][1] <= height/2;
   end else if(eaten) begin
     // 吃到食物了
-    food_x <= RAD+rand%400;
-    food_y <= RAD+next_rand(rand)%400;
+    food_x <= rand%width;
+    food_y <= next_rand(rand)%height;
 
     if (snake_len < MAX_LEN-1) begin
       snake_len <= snake_len + 1;
