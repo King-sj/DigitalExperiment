@@ -88,19 +88,20 @@ vga vga_shower(
 );
 
 //---------------------------------------------------
-wire [15:0] food_x, food_y;
+wire [15:0] score;
+wire game_over;
 snake_model snaker(
   .clk(clk),.reset(reset),
   .left(left_clean),.right(right_clean),.up(up_clean),.down(down_clean),
   .pix_x(x),.pix_y(y),
-  .color(color),.food_x(food_x),.food_y(food_y)
+  .color(color),.score(score),.game_over(game_over)
 );
 //----------------------------------------------------------
 score_show score_shower(
   .clk(clk),
-  .lcnt(food_x),
-  .rcnt(food_y),
-  .game_over(1'b0),
+  .lcnt(0),
+  .rcnt(score),
+  .game_over(game_over),
   .left_wei(left_wei),  // 左边的数码管
   .left_duan(left_duan),  //
   .right_wei(right_wei),  //

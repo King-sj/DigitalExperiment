@@ -1,6 +1,6 @@
 module snake_model(
   clk,reset,left,right,up,down,pix_x,pix_y,
-  color,food_x,food_y
+  color,score,game_over
 );
 parameter speed = 5,
   width = 640,
@@ -20,10 +20,12 @@ input signed [15:0] pix_y;
 
 
 output reg [11:0]color;
+output wire [15:0] score;
+output reg game_over=1;
 
 reg signed [15:0] dir[1:0];  // 方向 {0,1},...,
-output reg signed [15:0] food_x;
-output reg signed [15:0] food_y;
+reg signed [15:0] food_x;
+reg signed [15:0] food_y;
 //-------------------------------------------
 reg signed [15:0] snake_pos[MAX_LEN:0][1:0]; // 0:x, 1:y
 reg [15:0] snake_len = 1;
@@ -108,7 +110,7 @@ always @(posedge clk, negedge reset) begin:move
       snake_pos[k][0] <= width/2;
       snake_pos[k][1] <= height/2-2*k*RAD;
     end
-  end else begin
+  end else if(!game_over) begin
     if (snake_cnt == FLASH_CLOCK) begin  // 每隔10 ms 移动一次
       snake_cnt <= 0;
     end else begin
@@ -132,7 +134,7 @@ always @(posedge clk_game, negedge reset) begin:eat
   if (!reset) begin
     food_x <= 100;
     food_y <= 100;
-    snake_len <= 5;
+    snake_len <= 1;
   end else if(in_circle(snake_pos[0][0],snake_pos[0][1],food_x,food_y)) begin
     // 吃到食物了
     food_x <= (rand * width) >> 16;  // 假设rand是16位宽
@@ -143,13 +145,36 @@ always @(posedge clk_game, negedge reset) begin:eat
     end
   end
 end
-
+//--------------------------game voer------------------------------------
+assign score = snake_len - 1;
+function in_snake_body;
+  input signed[15:0] x;
+  input signed[15:0] y;
+  integer k;
+  begin
+    in_snake_body=0;
+    for (k=4;k < MAX_LEN; k=k+1) begin
+      if (k < snake_len && in_circle(snake_pos[k][0],snake_pos[k][1], x, y)) begin
+        in_snake_body=1;
+      end
+    end
+  end
+endfunction
+always @(posedge clk_game, negedge reset) begin:game_over_block
+  integer k;
+  if (!reset) begin
+    game_over <= 0;
+  end else if (in_snake_body(snake_pos[0][0],snake_pos[0][1]))begin
+    game_over <= 1;
+  end
+end
 //--------------------------show----------------------------------------
 always @(posedge clk) begin
   if (food_x < 0 || food_y < 0 || food_x >= width || food_y >= height) begin
     color <= 12'h0f0;
-  end
-  else if (in_snake(pix_x,pix_y)) begin
+  end else if (game_over) begin
+    color <= pix_x+pix_y;
+  end else if (in_snake(pix_x,pix_y)) begin
     color <= 12'h0ff;
   end else if(in_circle(pix_x,pix_y,food_x,food_y)) begin
     color <= 12'hf00;
