@@ -24,8 +24,12 @@ output wire [15:0] score;
 output reg game_over=1;
 
 reg signed [15:0] dir[1:0];  // 方向 {0,1},...,
-reg signed [15:0] food_x;
-reg signed [15:0] food_y;
+reg signed [15:0] food_x_temp;
+reg signed [15:0] food_y_temp;
+wire signed [15:0] food_x,food_y;
+// 修复玄学bug, food坐标偶现越界
+assign food_x = food_x_temp < 0 || food_x_temp > width ? 300 : food_x_temp;
+assign food_y = food_y_temp < 0 || food_y_temp > height ? 200 : food_y_temp;
 //-------------------------------------------
 reg signed [15:0] snake_pos[MAX_LEN:0][1:0]; // 0:x, 1:y
 reg [15:0] snake_len = 1;
@@ -108,7 +112,7 @@ always @(posedge clk, negedge reset) begin:move
     snake_cnt<=0;
     for (k=0; k < MAX_LEN; k = k+1)begin
       snake_pos[k][0] <= width/2;
-      snake_pos[k][1] <= height/2-2*k*RAD;
+      snake_pos[k][1] <= height/2;
     end
   end else if(!game_over) begin
     if (snake_cnt == FLASH_CLOCK) begin  // 每隔10 ms 移动一次
@@ -132,14 +136,13 @@ end
 always @(posedge clk_game, negedge reset) begin:eat
   integer k;
   if (!reset) begin
-    food_x <= 100;
-    food_y <= 100;
+    food_x_temp <= 100 + (rand % 300);
+    food_y_temp <= 100 + (next_rand(rand)%300);
     snake_len <= 1;
   end else if(in_circle(snake_pos[0][0],snake_pos[0][1],food_x,food_y)) begin
     // 吃到食物了
-    food_x <= (rand * width) >> 16;  // 假设rand是16位宽
-    food_y <= ((next_rand(rand) * height) >> 16);
-
+    food_x_temp <= (rand % width);
+    food_y_temp <= (next_rand(rand)%height);
     if (snake_len < MAX_LEN) begin
       snake_len <= snake_len + 1;
     end
@@ -170,7 +173,7 @@ always @(posedge clk_game, negedge reset) begin:game_over_block
 end
 //--------------------------show----------------------------------------
 always @(posedge clk) begin
-  if (food_x < 0 || food_y < 0 || food_x >= width || food_y >= height) begin
+  if (food_x < 0 || food_y < 0 || food_x > width || food_y > height) begin
     color <= 12'h0f0;
   end else if (game_over) begin
     color <= pix_x+pix_y;
