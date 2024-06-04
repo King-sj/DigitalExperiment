@@ -61,7 +61,7 @@
 #Constraint files
 #########
 #Do NOT ignore *.xdc files
-# !*.xdc
+!*.xdc
 #########
 #TCL - files
 #########

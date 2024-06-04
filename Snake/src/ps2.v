@@ -28,12 +28,11 @@ reg[7:0] ps2_byte_r;    //PC接收来自PS2的一个字节数据存储器
 reg[7:0] temp_data;      //当前接收数据寄存器
 reg[3:0] num;        //计数寄存器
 
-always @ (posedge clk or negedge   reset) begin
-  if(!  reset) begin
+always @ (posedge clk or negedge reset) begin
+  if(!reset) begin
       num <= 4'd0;
       temp_data <= 8'd0;
-    end
-  else if(neg_ps2k_clk) begin  //检测到ps2k_clk的下降沿
+  end else if(neg_ps2k_clk) begin  //检测到ps2k_clk的下降沿
       case (num)
         4'd0:  num <= num+1'b1;
         4'd1:  begin
@@ -82,28 +81,27 @@ end
 reg key_f0;    //松键标志位，置1表示接收到数据8'hf0，再接收到下一个数据后清零
 reg ps2_state_r;  //键盘当前状态，ps2_state_r=1表示有键被按下
 //+++++++++++++++数据处理开始++++++++++++++++=============
-always @ (posedge clk or negedge   reset) begin  //接收数据的相应处理，这里只对1byte的键值进行处理
+always @ (posedge clk or negedge reset) begin  //接收数据的相应处理，这里只对1byte的键值进行处理
   if(!  reset) begin
       key_f0 <= 1'b0;
       ps2_state_r <= 1'b0;
-    end
-  else if(num==4'd10) ///一帧数据是否采集完。
-      begin  //刚传送完一个字节数据
-          if(temp_data == 8'hf0) key_f0 <= 1'b1;//判断该接收数据是否为断码
+  end else if(num==4'd10) ///一帧数据是否采集完。
+  begin  //刚传送完一个字节数据
+    if(temp_data == 8'hf0) key_f0 <= 1'b1;//判断该接收数据是否为断码
+    else
+      begin
+        if(!key_f0)
+            begin  //说明有键按下
+              ps2_state_r <= 1'b1;
+              ps2_byte_r <= temp_data;  //锁存当前键值
+            end
         else
-          begin
-            if(!key_f0)
-                begin  //说明有键按下
-                  ps2_state_r <= 1'b1;
-                  ps2_byte_r <= temp_data;  //锁存当前键值
-                end
-            else
-                begin
-                  ps2_state_r <= 1'b0;
-                  key_f0 <= 1'b0;
-                end
-          end
+            begin
+              ps2_state_r <= 1'b0;
+              key_f0 <= 1'b0;
+            end
       end
+  end
 end
 always @ (ps2_byte_r) begin
   case (ps2_byte_r)
