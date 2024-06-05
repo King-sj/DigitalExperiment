@@ -45,12 +45,15 @@ module snake (
   output [3:0] right_wei,  //
   output [7:0] right_duan,
   inout ps2_clk,
-  inout ps2_data
+  inout ps2_data,
+  output beep,
+  output sd,
+  input enfast
 );
 wire [11:0]color;
 wire [9:0]x,y;  // 640x480
 //---------------------去抖动---------------------------------------------
-  wire left_clean, right_clean, up_clean, down_clean;
+  wire left_clean, right_clean, up_clean, down_clean,enfast_clean;
   debounce db_left(
     .clk(clk),
     .reset(reset),
@@ -74,6 +77,12 @@ wire [9:0]x,y;  // 640x480
     .reset(reset),
     .noisy_signal(down),
     .clean_signal(down_clean)
+  );
+  debounce db_enfast(
+    .clk(clk),
+    .reset(reset),
+    .noisy_signal(enfast),
+    .clean_signal(enfast_clean)
   );
 //-----------------------------VGA--------------------------------------------
 vga vga_shower(
@@ -115,5 +124,14 @@ score_show score_shower(
   .left_duan(left_duan),  //
   .right_wei(right_wei),  //
   .right_duan(right_duan)
+);
+//-------------------------------------------
+//---------------------------音频-------------------------------------------
+wire beep_w;
+assign beep = game_over & beep_w;
+audio_player audio(
+  .clk(clk),
+  .beep(beep_w),
+  .sd(sd)
 );
 endmodule
