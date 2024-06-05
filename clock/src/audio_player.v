@@ -35,7 +35,7 @@ output beep, //蜂鸣器输出
 output  sd
 );
   reg  beep_r;
-  reg[7:0] state;  //乐谱状态机
+  reg[31:0] state;  //乐谱状态机
   reg[16:0]count,pre_number;
   reg[25:0]beat_time;
   assign sd=1'b1;
@@ -69,49 +69,45 @@ always @(posedge clk) begin
       beat_time = beat_time + 1'b1;
    else begin
       beat_time = 26'd0;
-      if(state == 8'd13)
-        state = 8'd0;
+      if(state == 32'd32)
+        state = 32'd0;
       else
         state = state + 1'b1;
    case(state)
-
-pre_number = 0;
-pre_number = 0;
-8'D11:pre_number = M_5;
-pre_number = 0;
-8'D11:pre_number = M_5;
-8'D11:pre_number = M_5;
-8'D7:pre_number = M_1;
-pre_number = 0;
-8'D7:pre_number = M_1;
-8'D7:pre_number = M_1;
-8'D7:pre_number = M_1;
-8'D7:pre_number = M_1;
-8'D8:pre_number = M_2; // 重复一次re
-8'D8:pre_number = M_2; // 重复一次re
-8'D9:pre_number = M_3; // 重复一次mi
-8'D9:pre_number = M_3; // 重复一次mi
-
-// 图片 2
-pre_number = 0;
-pre_number = 0; // 重复两次停顿
-8'D11:pre_number = M_5;
-pre_number = 0;
-8'D11:pre_number = M_5;
-8'D11:pre_number = M_5;
-8'D7:pre_number = M_1;
-pre_number = 0;
-8'D7:pre_number = M_1;
-8'D7:pre_number = M_1;
-8'D8:pre_number = M_2; // 重复一次re
-8'D9:pre_number = M_3; // 重复一次mi
-8'D8:pre_number = M_2; // 重复一次re
-8'D7:pre_number = M_1; // 重复一次do
-8'D11:pre_number = M_5; // 重复一次so
-8'D11:pre_number = M_5; // 重复一次so
-
-
-    default: pre_number = 16'h0;
+    32'D0:pre_number = 0;
+    32'D1:pre_number = 0;
+    32'D2:pre_number = M_5;
+    32'D3:pre_number = 0;
+    32'D4:pre_number = M_5;
+    32'D5:pre_number = M_5;
+    32'D6:pre_number = M_1;
+    32'D7:pre_number = 0;
+    32'D8:pre_number = M_1;
+    32'D9:pre_number = M_1;
+    32'D10:pre_number = M_1;
+    32'D11:pre_number = M_1;
+    32'D12:pre_number = M_2; // 重复一次re
+    32'D13:pre_number = M_2; // 重复一次re
+    32'D14:pre_number = M_3; // 重复一次mi
+    32'D15:pre_number = M_3; // 重复一次mi
+    // 2
+    32'D16:pre_number = 0;
+    32'D17:pre_number = 0; // 重复两次停顿
+    32'D18:pre_number = M_5;
+    32'D19:pre_number = 0;
+    32'D20:pre_number = M_5;
+    32'D21:pre_number = M_5;
+    32'D22:pre_number = M_1;
+    32'D23:pre_number = 0;
+    32'D24:pre_number = M_1;
+    32'D25:pre_number = M_1;
+    32'D26:pre_number = M_2; // 重复一次re
+    32'D27:pre_number = M_3; // 重复一次mi
+    32'D28:pre_number = M_2; // 重复一次re
+    32'D29:pre_number = M_1; // 重复一次do
+    32'D30:pre_number = M_5; // 重复一次so
+    32'D31:pre_number = M_5; // 重复一次so
+    default: pre_number = 32'h0;
    endcase
    end
 end

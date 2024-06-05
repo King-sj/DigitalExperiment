@@ -5,7 +5,7 @@ module snake_model(
 parameter speed = 5,
   width = 640,
   height = 480,
-  MAX_LEN = 30,
+  MAX_LEN = 18,
   RAD = 10,
   FLASH_CLOCK=10000000;  // 游戏刷新周期 (100MHZ/FLASH_CLOCK)
 input clk;
@@ -116,19 +116,15 @@ always @(posedge clk, negedge reset) begin:move
     end
   end else if(!game_over) begin
     if (snake_cnt == FLASH_CLOCK) begin  // 每隔10 ms 移动一次
-      snake_cnt <= 0;
-    end else begin
-      snake_cnt <= snake_cnt + 1;
-    end
-    // 间隔与初始值无关，只与速度有关
-    if (snake_cnt < MAX_LEN) begin
-      if (snake_idx == 0) begin
-        snake_pos[0][0] <= (snake_pos[0][0] + speed*dir[0] + width) % width;
-        snake_pos[0][1] <= (snake_pos[0][1] + speed*dir[1] + height) % height;
-      end else begin
-        snake_pos[snake_idx][0] <= snake_pos[snake_idx-1][0];
-        snake_pos[snake_idx][1] <= snake_pos[snake_idx-1][1];
+      snake_cnt = 0;
+      for (k=MAX_LEN-2; k >= 0; k = k-1) begin
+        snake_pos[k+1][0] = snake_pos[k][0];
+        snake_pos[k+1][1] = snake_pos[k][1];
       end
+      snake_pos[0][0] = (snake_pos[0][0] + speed*dir[0] + width) % width;
+      snake_pos[0][1] = (snake_pos[0][1] + speed*dir[1] + height) % height;
+    end else begin
+      snake_cnt = snake_cnt + 1;
     end
   end
 end
