@@ -54,7 +54,7 @@ output  sd
     M_5 = 18'd42553,  //中音5
     M_6 = 18'd37936,  //中音6
     M_7 = 18'd33783;  //中音7
-parameter  TIME = 50000000; //每种音阶持续时长为500ms
+parameter  TIME = 25000000; //每种音阶持续时长为500ms
 assign beep = beep_r;
 always@(posedge clk) begin
   count <= count + 1'b1;
@@ -74,20 +74,43 @@ always @(posedge clk) begin
       else
         state = state + 1'b1;
    case(state)
-    8'D0:pre_number=L_1;
-    8'D1:pre_number=L_2;
-    8'D2:pre_number=L_3;
-    8'D3:pre_number=L_4;
-    8'D4:pre_number=L_5;
-    8'D5:pre_number=L_6;
-    8'D6:pre_number=L_7;
-    8'D7:pre_number=M_1;
-    8'D8:pre_number=M_2;
-    8'D9:pre_number=M_3;
-    8'D10:pre_number=M_4;
-    8'D11:pre_number=M_5;
-    8'D12:pre_number=M_6;
-    8'D13:pre_number=M_7;
+
+pre_number = 0;
+pre_number = 0;
+8'D11:pre_number = M_5;
+pre_number = 0;
+8'D11:pre_number = M_5;
+8'D11:pre_number = M_5;
+8'D7:pre_number = M_1;
+pre_number = 0;
+8'D7:pre_number = M_1;
+8'D7:pre_number = M_1;
+8'D7:pre_number = M_1;
+8'D7:pre_number = M_1;
+8'D8:pre_number = M_2; // 重复一次re
+8'D8:pre_number = M_2; // 重复一次re
+8'D9:pre_number = M_3; // 重复一次mi
+8'D9:pre_number = M_3; // 重复一次mi
+
+// 图片 2
+pre_number = 0;
+pre_number = 0; // 重复两次停顿
+8'D11:pre_number = M_5;
+pre_number = 0;
+8'D11:pre_number = M_5;
+8'D11:pre_number = M_5;
+8'D7:pre_number = M_1;
+pre_number = 0;
+8'D7:pre_number = M_1;
+8'D7:pre_number = M_1;
+8'D8:pre_number = M_2; // 重复一次re
+8'D9:pre_number = M_3; // 重复一次mi
+8'D8:pre_number = M_2; // 重复一次re
+8'D7:pre_number = M_1; // 重复一次do
+8'D11:pre_number = M_5; // 重复一次so
+8'D11:pre_number = M_5; // 重复一次so
+
+
     default: pre_number = 16'h0;
    endcase
    end
