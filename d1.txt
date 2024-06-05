@@ -1,0 +1,20 @@
+Snake/src/fibonacci_lfsr.v
+Snake/src/snake_model.v
+Snake/src/snake.v
+Snake/src/vga.v
+
+
+Mr. Cai:
+  clock/src/smg_ip_model.v
+  clock/src/timer_show.v TabletFillingMachine/src/tablet_show.v Snake/src/score_show.v
+  TabletFillingMachine/src/tabletFillingMachine.v
+
+Mr. Li:
+  clock/src/timer_setting.v
+  clock/src/counter.v
+  clock/src/Ktime.v
+
+Mr. Wei:
+  clock/src/audio_player.v
+  clock/src/clock.v
+  clock/src/debounce.v
